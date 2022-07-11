@@ -7,6 +7,7 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Mario kart</title>
     <link rel="stylesheet" href="mario-kart.css">
+    <link rel="preload" as="image" href="./src/map-1c.png">
     <style>
         .indicateur{
             position: absolute;
@@ -20,31 +21,38 @@
         }
     </style>
 </head>
-<body class="tv">
+<body class="tv load">
 <div id="game">
-    <piece class="objet" size="1" x="396" y="-12"></piece>
-    <box class="objet" size="1" x="450" y="-12"></box>
+    <piece class="objet" size="1" x="396" y="-16"></piece>
+    <box class="objet" size="1" x="450" y="-16"></box>
     <mapr>
         <map  style="transform: rotateZ(51deg) translate(17.2092em, 245.992em);">
         </map>
     </mapr>
 
-    <kart style="background-position-y: 0em;background-position-x: -1em">
+    <kart>
         <player></player>
     </kart>
 </div>
 <div id="screen">
     <div class="select-item">
-
+        <item></item>
     </div>
     <div id="timer">time    <span>0:00:000</span></div>
     <div id="rang"></div>
-    <div id="info">Info
-    </div>
+    <div id="info"></div>
 </div>
+<div class="resolution-fix">ecran trop petit ..</div>
 <script>
+    let devmod=false;
+    let firstInteract=false;
+    document.addEventListener('click',()=>{
+        if(!firstInteract) firstInteract=true;
+    })
+    let mapName="map-1";
+    document.getElementsByTagName('map')[0].style.backgroundImage='url("./src/'+mapName+'c.png")'
+    let info="", context = "";
     let map = new Image();
-    let context = "";
     map.onload = () => {
         canvas = document.createElement('canvas');
         context=canvas.getContext('2d')
@@ -52,39 +60,19 @@
         canvas.height=map.height;
         context.drawImage(map, 0, 0);
     }
-    map.src = './src/map-1-mask.png';
-    let info="";
-    function Angle(x1,y1,x2,y2) {
-        let angle=Math.atan2(x1-x2,y1-y2);
-        angle*=180/Math.PI;
-        if(angle<0)angle+=360;
-        return angle;
-    }
-    function Distance(x1,y1,x2,y2){
-        let distance=Math.sqrt(Math.pow(x1-x2,2)+Math.pow(y1-y2,2));
-        return distance;
-    }
-    function CalcAngle(ang1,ang2){
-        let angle=(ang1-ang2)%360;
-        if(ang2>ang1){
-            angle=(ang2-ang1)%360;
+    map.src = './src/'+mapName+'-mask.png';
+
+    class music{
+        static playSound(name,volume,rate=1){
+            let audio = new Audio('./src/'+name+'.ogg');
+            audio.playbackRate=rate;
+            audio.volume=volume
+            audio.play();
         }
-        if(angle<0) angle+=360;
-        return angle;
-    }
-    function diffAngle(ang1,ang2){
-        ang1=ang1%360;
-        ang2=(ang2+180)%360;
-        let diff=ang2-ang1;
-        /*if(ang1>ang2){
-            diff=ang1-ang2;
-        }*/
-        if(diff>180) diff-=360;
-        if(diff<-180) diff+=360;
-        return diff;
     }
     class bloc{
         static isBloc(color){
+            //return false;
             if(color==="#f80000" || color==="#00a800"){
                 return true;
             }
@@ -101,14 +89,49 @@
             var hex = c.toString(16);
             return hex.length == 1 ? "0" + hex : hex;
         }
+        static evalBump(posx,posy,speed){
+            if(context){
+                let pickx=Math.round((1000-(posx+500))*1.024),
+                    picky=Math.round((1000-(posy+500))*1.025),
+                    //{data} = context.getImageData(pickx,picky, 1, 1),
+                    bumpx=0,
+                    bumpy=0;
+                if(bloc.isBloc(bloc.DataToHex(context.getImageData(pickx+speed,picky, 1, 1).data))) bumpx++;
+                if(bloc.isBloc(bloc.DataToHex(context.getImageData(pickx-speed,picky, 1, 1).data))) bumpx--;
+                if(bloc.isBloc(bloc.DataToHex(context.getImageData(pickx,picky+speed, 1, 1).data))) bumpy++;
+                if(bloc.isBloc(bloc.DataToHex(context.getImageData(pickx,picky-speed, 1, 1).data))) bumpy--;
+                return {bumpX:bumpx,bumpY:bumpy};
+            }
+            return {bumpX:0,bumpY:0};
+        }
     }
+    const contextAudio = new AudioContext();
+
+    function loadSample(url) {
+        return fetch(url)
+            .then(response => response.arrayBuffer())
+            .then(buffer => contextAudio.decodeAudioData(buffer));
+    }
+
+    function playSample(sample, rate=0.1) {
+        const source = contextAudio.createBufferSource();
+        source.buffer = sample;
+        source.playbackRate.value = rate;
+        source.loop=true;
+        source.connect(contextAudio.destination);
+        source.start(0);
+        return source;
+    }
+
     class kart{
-        rotate=0;
-        posx=-398;
-        posy=-68;
+        changeItem=false;
+        engineSound=null;
+        rotate=parseFloat(localStorage.getItem("rotate")??0);
+        posx=parseFloat(localStorage.getItem("posx")??-398);
+        posy=parseFloat(localStorage.getItem("posy")??-68);
         acceleration=0;
         vitesse=0;
-        vMax=4;
+        vMax=3.5;
         pressTurn=0;
         pressAccelerate=0;
         turnAnim=0;
@@ -120,32 +143,42 @@
         constructor(){
             this.endRefresh();
             this.loopRefresh=setInterval(() => {
-                if(this.pressTurn || this.pressAccelerate || this.statechange){
+                if(this.changeItem){
+                    document.getElementsByTagName("item")[0].style.backgroundPositionX="-"+Math.floor(Math.random()*8.99)+"em";
+                }
+                if(0 && !this.engineSound && firstInteract){
+                    this.engineSound=1
+                    loadSample('./src/engine3.ogg')
+                        .then(sample => {
+                            this.engineSound=playSample(sample)
+                            this.engineSound.playbackRate.value = 2;
+                        });
+                }
+                if(this.statechange || this.pressTurn || this.pressAccelerate){
                     this.statechange=1;
                     this.refresh();
                     setTime();
-                    info="posx: "+this.posx+
-                        "\nposy: "+this.posy+
-                        "\nrotate: "+this.rotate+
-                        "\nvitesse: "+this.vitesse+
-                        "\npieces: "+this.pieces+
-                        "\ndrift: "+this.drift+
-                        "\nturn anim: "+this.turnAnim;
-                    if(info!==document.getElementById("info").innerHTML) document.getElementById("info").innerHTML=info;
-                    if(context){
-                        let pickx=Math.round((1000-(this.posx+500))*1.024);
-                        let picky=Math.round((1000-(this.posy+500))*1.025);
-                        let {data} = context.getImageData(pickx,picky, 1, 1);
-                        let bumpx=0;
-                        let bumpy=0;
-                        if(bloc.isBloc(bloc.DataToHex(context.getImageData(pickx+this.vMax,picky, 1, 1).data))) bumpx++;
-                        if(bloc.isBloc(bloc.DataToHex(context.getImageData(pickx-this.vMax,picky, 1, 1).data))) bumpx--;
-                        if(bloc.isBloc(bloc.DataToHex(context.getImageData(pickx,picky+this.vMax, 1, 1).data))) bumpy++;
-                        if(bloc.isBloc(bloc.DataToHex(context.getImageData(pickx,picky-this.vMax, 1, 1).data))) bumpy--;
-                        if(bumpy || bumpx){
-                            this.posx+=bumpx*Math.abs(this.acceleration);
-                            this.posy+=bumpy*Math.abs(this.acceleration);
+                    if(this.engineSound && this.engineSound!=1) this.engineSound.playbackRate.value=Math.abs(this.vitesse/5)+0.3;
+                    if(devmod) {
+                        info="posx: "+this.posx+
+                            "\nposy: "+this.posy+
+                            "\nrotate: "+this.rotate+
+                            "\nvitesse: "+this.vitesse+
+                            "\npieces: "+this.pieces+
+                            "\ndrift: "+this.drift+
+                            "\nturn anim: "+this.turnAnim;
+                        if(info!==document.getElementById("info").innerHTML) document.getElementById("info").innerHTML=info;
+                    }
+                    if(context && this.vitesse){
+                        let {bumpX,bumpY}=bloc.evalBump(this.posx,this.posy,this.vMax)
+                        if(bumpX || bumpY){
+                            if(Math.abs(this.acceleration)===this.vMax){
+                                music.playSound("bump",0.15)
+                            }
+                            this.posx+=bumpX*Math.abs(this.acceleration);
+                            this.posy+=bumpY*Math.abs(this.acceleration);
                             this.acceleration=this.acceleration/1.2;
+
                         }
                     }
                     this.setObject();
@@ -160,43 +193,64 @@
             document.querySelectorAll(".objet").forEach(function(objet) {
                 let x=parseInt(objet.getAttribute("x"));
                 let y=parseInt(objet.getAttribute("y"));
-                let angle=Angle(that.posx,that.posy,x,y);
-                let angleCam=Angle(posxCam,posyCam,x,y);
-                let distance=Distance(that.posx,that.posy,x,y);
-                if(0 && distance<10){
+                let distance=kart.Distance(that.posx,that.posy,x,y);
+                if(distance<8){
+                    switch (objet.tagName){
+                        case "PIECE":
+                            that.pieces++;
+                            music.playSound("coin",0.5)
+                            break;
+                        case "BOX":
+                            that.changeItem=true;
+                            music.playSound("item-box2",0.15)
+                            setTimeout(()=>{
+                                that.changeItem=false;
+                                let item=document.getElementsByTagName("item")[0];
+                                item.classList.remove("strobe")
+                                item.clientHeight;
+                                item.classList.add("strobe")
+                            },4000)
+                            break;
+                    }
                     objet.remove();
-                    that.pieces++;
+
                 }else{
-                    let distanceCam=Distance(posxCam,posyCam,x,y);
+                    let angle=kart.Angle(that.posx,that.posy,x,y);
+                    let angleCam=kart.Angle(posxCam,posyCam,x,y);
+                    let distanceCam=kart.Distance(posxCam,posyCam,x,y);
                     let rotate=that.rotate%360;
                     if(rotate<0) rotate+=360;
-                    let direction=diffAngle(angle,rotate)
-                    let directionCam=diffAngle(angleCam,rotate)
-
-                    let size=1/(distanceCam/100);
+                    let direction=kart.diffAngle(angle,rotate)
+                    let directionCam=kart.diffAngle(angleCam,rotate)
                     let back=1;
                     let backAng=1-(Math.abs(direction)/90);
-                    let backAng2=(direction/90);
+                    let backAng2=(directionCam/90);
                     if(Math.abs(direction)>90){
                         back=-1;
-                        //size=1+distance/20;
-                        backAng2=backAng2-((backAng2+Math.sign(-backAng2))*2);
+                    }
+                    let bottom=600 - (19500 / ((distance*backAng) +55));
+                    bottom+=(Math.abs(backAng2*1.4)*(600-bottom))*(backAng);
+                    //document.getElementById("info").innerHTML+="\nangle: "+backAng2+" ** "+backAng+" ** "+((600-bottom)*(backAng));
+                    if(distance*backAng<-40){
+                        bottom=-600
+                        if(parseInt(objet.style.bottom)===bottom){
+                            return;
+                        }
                     }
                     //let translateX=backAng2*((distance/widthScreen)*1000);
                     // pour angle = -0.5 ((4000)/(x+70))-7
                     // pour angle = -0.3 ((4000)/(x+117))+11.7
-                    let left=(distance*500*backAng2)/(widthScreen/2)+(0.00058/backAng2);
+                    //let left=(distance*500*backAng2)/(widthScreen/2)+(0.00058/backAng2);
+                    let left=backAng2*(100);
                     objet.style.zIndex=(3-back).toString();
-                    document.getElementById("info").innerHTML+="angle: "+backAng2;
-                    let bottom=1 - (12000 / ((distance*backAng) + 45)) + 566;
-                    if(distance*backAng<-40) bottom=-600
+                    //let bottom=563 - (15200 / ((distance*backAng) +49))+(Math.abs(backAng2)*34);
+                    let size=(600-bottom)/300;
                     objet.setAttribute("ang",backAng2)
                     objet.setAttribute("dist",distance)
                     objet.style.bottom=bottom+"px";
                     objet.style.left=(left+50)+"%";
-                    objet.style.transform="scale("+size+") translate(-50%,50%)";
+                    objet.style.transform="translate(-50%,50%) scale("+size+")";
                 }
-
             });
         }
         refresh(){
@@ -214,37 +268,43 @@
             if(this.drift && this.vitesse){
                 this.turnAnim=3;
                 this.turnAnim+=this.pressTurn*this.drift;
+                this.turnAnim*=this.drift;
                 this.rotate+=this.drift*1.5+this.pressTurn*1.2;
             }else{
                 if(this.pressTurn){
                     let r=Math.abs(this.vitesse/2);
-                    this.rotate=this.rotate+(this.pressTurn*Math.log(r + 1)*2)*Math.sign(this.vitesse);//(Math.pow(Math.exp(1),-Math.pow(((r * 50 - 3) / 150),2))*Math.log(r + 1))*this.pressTurn*10;
-                    //this.rotate+=this.pressTurn*2;
+                    if(devmod) this.rotate+=this.pressTurn*2;
+                    else this.rotate=this.rotate+(this.pressTurn*Math.log(r + 1)*2)*Math.sign(this.vitesse);//(Math.pow(Math.exp(1),-Math.pow(((r * 50 - 3) / 150),2))*Math.log(r + 1))*this.pressTurn*10;
                     if(Math.abs(this.turnAnim+this.pressTurn)<3) this.turnAnim+=this.pressTurn;
                 }else{
-                    if(this.turnAnim) this.turnAnim-=Math.sign(this.turnAnim);
+                    this.turnAnim-=Math.sign(this.turnAnim);
                 }
             }
             this.setAnim();
             let data="rotateZ("+this.rotate+"deg) translate("+this.posx+"em, "+this.posy+"em)"
-            this.map.style.transform=data;
+            if(this.map.style.transform!==data) this.map.style.transform=data;
         }
         setAnim(){
             let kart=document.querySelector("kart");
-            let player=document.querySelector("kart player");
+            let player=kart.querySelector("player");
             let anim=1;
-            if(this.vitesse<0){
-                player.style.backgroundPositionY="-2em";
-                player.style.backgroundPositionX="-4em";
+            let spriteY="-2em",spriteX="-4em";
+            if(this.vitesse<0 && !player.classList.contains("reverse")){
+                kart.classList.add("reverse")
             }else{
-                if(this.turnAnim) anim=1+Math.abs(this.turnAnim);
-                if(this.drift>0 || (this.drift==0 && this.turnAnim>0)) kart.style.transform="scale(3) translateZ(10px) scaleX(-1)";
-                else kart.style.transform="scale(3) translateZ(10px)";
-                if(!this.vitesse&&this.turnAnim) player.style.backgroundPositionY="-2em";
-                else player.style.backgroundPositionY="0em";
-                player.style.backgroundPositionX="-"+anim+"em";
-            }
+                if(kart.classList.contains("reverse")) kart.classList.remove("reverse");
 
+                if(this.drift>0 || (!this.drift && this.turnAnim>0)) kart.classList.add("mirror");
+                else kart.classList.remove("mirror");
+                if(this.turnAnim) anim=1+Math.abs(this.turnAnim);
+                spriteY="0em";spriteX="-"+anim+"em";
+                if(!this.vitesse&&this.turnAnim) spriteY="-2em";
+                player.style.backgroundPositionX="-"+anim+"em";
+
+
+            }
+            if(player.style.backgroundPositionY!==spriteY) player.style.backgroundPositionY=spriteY
+            if(player.style.backgroundPositionX!==spriteX) player.style.backgroundPositionX=spriteX
         }
         setVector(){
             this.vitesse=Math.min(this.acceleration,this.vMax);
@@ -257,8 +317,25 @@
             }
 
         }
+        static Angle(x1,y1,x2,y2) {
+            let angle=Math.atan2(x1-x2,y1-y2);
+            angle*=180/Math.PI;
+            if(angle<0)angle+=360;
+            return angle;
+        }
+        static Distance(x1,y1,x2,y2){
+            return Math.sqrt(Math.pow(x1-x2,2)+Math.pow(y1-y2,2));
+        }
+        static diffAngle(ang1,ang2){
+            ang1=ang1%360;
+            ang2=(ang2+180)%360;
+            let diff=ang2-ang1;
+            if(diff>180) diff-=360;
+            if(diff<-180) diff+=360;
+            return diff;
+        }
     }
-    var TimeStartGame=Date.now();
+    let TimeStartGame=Date.now();
     function setTime(){
         let now=Date.now()-TimeStartGame;
         let ms=now.toString().slice(-3);
@@ -267,13 +344,11 @@
         document.querySelector("#timer span").innerHTML=min+":"+sec+":"+ms
     }
     let player=new kart();
+
     listKeyPressed=[];
     function updateKey(){
         player.pressTurn=0;
         player.pressAccelerate=0;
-        if(listKeyPressed[' ']) {
-            themeMusic.pause();
-        }
         if(listKeyPressed['Enter']) player.endRefresh();
         if(listKeyPressed['s']) player.pressAccelerate=-1;
         if(listKeyPressed['z']) player.pressAccelerate=1;
@@ -281,16 +356,54 @@
         if(listKeyPressed['d']) player.pressTurn=-1;
     }
     document.addEventListener('keypress',function(e){
-        if(e.key==="d") listKeyPressed["q"]=0;
-        if(e.key==="q") listKeyPressed["d"]=0;
-        if(e.key==="z") listKeyPressed["s"]=0;
-        if(e.key==="s") listKeyPressed["z"]=0;
-        if(e.key==="a") player.statechange=0;
-        if(e.key===" "&&!listKeyPressed[" "]){
-            player.drift=player.pressTurn;
-            document.querySelector("kart").classList.remove("jump");
-            document.querySelector("kart").clientHeight;
-            document.querySelector("kart").classList.add("jump");
+        switch (e.key){
+            case "w":
+                localStorage.setItem("rotate",player.rotate);
+                localStorage.setItem("posx",player.posx);
+                localStorage.setItem("posy",player.posy);
+                break;
+            case "a":
+                player.statechange=0;
+                break;
+            case "d":
+                listKeyPressed["q"]=0;
+                break;
+            case "q":
+                listKeyPressed["d"]=0;
+                break;
+            case "z":
+                listKeyPressed["s"]=0;
+                break;
+            case "s":
+                listKeyPressed["z"]=0;
+                break;
+            case " ":
+                if(!listKeyPressed[' ']){
+                    let kart=document.querySelector("kart");
+                    if(!kart.classList.contains("jump")){
+                        player.drift=player.pressTurn;
+                        kart.classList.remove("jump");
+                        kart.clientHeight;
+                        kart.classList.add("jump");
+                        setTimeout(()=>{
+                            kart.classList.remove("jump");
+                        },500)
+                    }
+                }
+                break;
+                case "e":
+                    if(start){
+                        start=0;
+                        kartEngine.volume=.2
+                        kartEngine.loop=true;
+                        themeMusic.play();
+                        //kartEngine.play();
+                        themeMusic.volume=0.05
+                    }else{
+                        start=1
+                        themeMusic.pause();
+                    }
+                    break;
         }
         listKeyPressed[e.key]=1;
         updateKey();
@@ -302,7 +415,7 @@
         listKeyPressed[e.key]=0;
         updateKey();
     })
-    var themeMusic = new Audio('./src/Mario Kart Music.ogg');
+    var themeMusic = new Audio('./src/music-map1.ogg');
     var kartEngine = new Audio('./src/Mario Kart Engine Sound1.wav');
     var start=1;
     kartEngine.addEventListener('timeupdate', function(){
@@ -312,16 +425,10 @@
             this.play()
         }
     });
-    document.addEventListener('click',()=>{
-        if(start){
-            start=0;
-            kartEngine.volume=.2
-            kartEngine.loop=true;
-            //themeMusic.play();
-            //kartEngine.play();
-            themeMusic.volume=0.1
-        }
-    })
+    setTimeout(()=>{
+        document.body.classList.remove("load");
+    },40)
+
 </script>
 </body>
 </html>
