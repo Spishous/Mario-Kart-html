@@ -1,0 +1,331 @@
+<!doctype html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Menu principal</title>
+    <style>
+        @font-face {font-family:"mario kart";src:url("./src/Mario-Kart-DS.woff2") format("woff2")}
+        html {
+            cursor: none;
+        }
+        body {
+            margin: 0;
+            height: 100vh;
+            overflow: hidden;
+            font-family: "mario kart",sans-serif;
+            background: linear-gradient(0deg,#cbe1ff, #6d97c7, #005ec9, #004494);
+            color: white;
+            position: relative;
+        }
+        body:before {
+            content: "";
+            position: absolute;
+            background-image: url(./src/grid.png);
+            background-size: 100px;
+            background-position: top;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            z-index: -1;
+        }
+        cursor {
+            position: fixed;
+            background: url(./src/hand.png);
+            font-size: 50px;
+            height: 1em;
+            width: 1em;
+            background-size: 2em;
+            pointer-events: none;
+        }
+        cursor.clic{
+            background-position-x: 1em;
+        }
+        h1 {
+            font-size: 3.5em;
+            margin-top: 2em;
+        }
+        * {
+            user-select: none;
+        }
+        ul {
+            position: absolute;
+            left: 0;
+            right: 0;
+            top: 0;
+            bottom: 0;
+            padding: 0;
+            list-style: none;
+        }
+        li.active ~ li {
+            opacity: 0;
+            transform: translateX(50%);
+            pointer-events: none;
+        }
+        li.active {
+            opacity: 1;
+            transform: translateX(0);
+            pointer-events: all;
+        }
+        li {
+            opacity: 0;
+            display: flex;
+            transform: translate(-50%);
+            left: 0;
+            right: 0;
+            top: 0;
+            bottom: 0;
+            align-items: center;
+            flex-direction: column;
+            position: absolute;
+            pointer-events: none;
+            transition: transform 500ms,opacity 500ms;
+        }
+        #section li.center {
+            justify-content: center;
+            padding-bottom: 10em;
+        }
+        li.center h1 {
+            margin: 0.5em 0;
+        }
+        .anime-zoom{
+            animation: zoom 600ms infinite alternate;
+        }
+        @keyframes zoom {
+            from{
+                transform: scale(1);
+            }
+            to{
+                transform: scale(1.1);
+            }
+        }
+        .double-text {
+            position: relative;
+            font-weight: normal;
+            letter-spacing: 0.108em;
+            white-space: pre;
+            font-size: 64px;
+            color: #9cddff;
+        }
+        .double-text span {
+            position: absolute;
+            left: -1%;
+            text-transform: uppercase;
+            color: #0d3d83;
+            letter-spacing: -1px;
+        }
+        credit {
+            position: fixed;
+            bottom: 1em;
+            right: 2em;
+            color: black;
+            font-size: 1.8rem;
+            white-space: pre;
+            pointer-events: none;
+        }
+        .choice #less {
+            transform: scale(-1);
+        }
+        .choice #less, .choice #more {
+            height: 1em;
+            width: 1em;
+            display: inline-flex;
+            background-image: url(./src/btn-arrow.png);
+            background-size: 1em;
+            padding: 1em;
+            background-repeat: no-repeat;
+            background-position: center;
+        }
+        li>.center {
+            flex: 0.7;
+            display: flex;
+            align-items: center;
+        }
+        #level {
+            background: url(./src/level.png);
+            width: 1em;
+            height: 1em;
+            display: inline-flex;
+            background-size: cover;
+            font-size: 3em;
+        }
+        .choice {
+            font-size: 4rem;
+            display: flex;
+            align-items: center;
+        }
+        .next {
+            font-size: 1.8rem;
+            margin: 0 20% 0 auto;
+            padding: 0.3em 0.8em;
+            border: 4px solid #5187dd;
+            border-right-color: #012055;
+            border-bottom-color: #012055;
+            background: #0d4096;
+            outline: 4px solid black;
+        }
+        #black-mask:after {
+            background-image: url(./src/back-mask.png);
+            content: "";
+            position: absolute;
+            top: 100%;
+            height: 1em;
+            background-size: auto 1em;
+            font-size: 4rem;
+            width: 100%;
+            display: block;
+        }
+        #black-mask {
+            width: 100%;
+            z-index: 9;
+            top: 0;
+            bottom: 100%;
+            background: black;
+            position: fixed;
+            transform: translateY(-1em);
+            font-size: 4rem;
+            transition: bottom 1s cubic-bezier(0.68, 0.06, 1, 0.78);
+        }
+        #black-mask.show {
+            bottom: -1em;
+        }
+        .kart {
+            font-size: 8rem;
+            background-image: url(./src/kart-sprite.png);
+            height: 1em;
+            width: 1em;
+            background-size: 700% auto;
+        }
+    </style>
+</head>
+<body>
+<ul id="section">
+    <li id="s1" class="center active">
+        <h1 class="anime-zoom double-text">mario kart web<span>mario  kart  web</span></h1>
+    </li>
+    <li id="s2" class="active">
+        <h1>niveau</h1>
+        <div class="center">
+            <div class="choice">
+                <span id="less" data-element="level"></span>
+                <span id="level" min="0" max="3" value="0" class="anime-zoom"></span>
+                <span id="more" data-element="level"></span>
+            </div>
+        </div>
+        <div class="next">suivant</div>
+    </li>
+    <li id="s3" class="active">
+        <h1>personnage</h1>
+        <div class="center">
+            <div class="kart"></div>
+        </div>
+        <div class="next">suivant</div>
+    </li>
+    <li id="s4" class="active">
+        <h1>course</h1>
+        <div class="center">
+            <div class="map" style="
+    background-image: url(./src/map-list.png);
+    height: 1em;
+    width: 1em;
+    font-size: 8em;
+    background-size: auto 200%;
+">
+            </div>
+        </div>
+        <div id="run" class="next">demarrer</div>
+    </li>
+</ul>
+
+<credit>lucas  rayan</credit>
+    <cursor></cursor>
+<div id="black-mask"></div>
+<script>
+    let cursor=document.getElementsByTagName("cursor")[0]
+    cursor.style.left="-50px";
+    cursor.style.top="-50px";
+    document.addEventListener("mousemove",function(e){
+        cursor.style.left=e.clientX+"px";
+        cursor.style.top=e.clientY+"px";
+    })
+
+    let firstInteract=0;
+    document.querySelectorAll(".next").forEach(el=> {
+            el.addEventListener("click",()=>{
+                if(el.id!=="run") {
+                    el.parentElement.classList.remove('active')
+                    playSound('select', 0.3, false)
+                }else{
+                    playSound('startmenu', 0.25, false)
+                    mainTheme.pause();
+                    document.querySelector("#black-mask").classList.add('show')
+                    setTimeout(()=>{
+                        location = "index.html";
+                    },1300)
+
+                }
+            })
+    })
+    document.querySelectorAll(".choice #less").forEach(el=> {
+        el.addEventListener('click', function(e){
+            playSound('choose-option1',0.3,false)
+            let id=el.getAttribute("data-element");
+            let obj=document.getElementById(id);
+            let min=parseInt(obj.getAttribute("min")??0)
+            let max=parseInt(obj.getAttribute("max"))
+            let value=parseInt(obj.getAttribute("value")??0)
+            value--;
+            if(value<min) value=max;
+            obj.setAttribute("value",value);
+            obj.style.backgroundPositionX="-"+value+"em";
+        })
+    })
+    document.querySelectorAll(".choice #more").forEach(el=> {
+        el.addEventListener('click', function(e){
+            playSound('choose-option1',0.3,false)
+            let id=el.getAttribute("data-element");
+            let obj=document.getElementById(id);
+            let min=parseInt(obj.getAttribute("min")??0)
+            let max=parseInt(obj.getAttribute("max"))
+            let value=parseInt(obj.getAttribute("value")??0)
+            value++;
+            if(value>max) value=min;
+            obj.setAttribute("value",value);
+            obj.style.backgroundPositionX="-"+value+"em";
+        })
+    })
+
+    document.addEventListener('mousedown',()=>{
+        if(!cursor.classList.contains("clic")) cursor.classList.add('clic')
+    })
+    document.addEventListener('click',()=>{
+        if(cursor.classList.contains("clic")) cursor.classList.remove('clic')
+    })
+    document.addEventListener('click',()=>{
+        if(firstInteract && document.getElementById("s1").classList.contains("active")){
+            firstInteract++;
+            console.log("e")
+            playSound('startmenu',0.25,false)
+            document.getElementById("s1").classList.remove("active")
+        }
+        if(!firstInteract){
+            firstInteract++;
+            mainTheme=playSound('main-theme',0.07,true)
+        }
+    })
+    let mainTheme=null;
+    function playSound(name,volume,loop=false,rate=1){
+        let audio = new Audio('./src/'+name+'.ogg');
+        audio.playbackRate=rate;
+        audio.loop=loop;
+        audio.volume=volume
+        audio.play();
+        return audio;
+    }
+
+</script>
+</body>
+</html>

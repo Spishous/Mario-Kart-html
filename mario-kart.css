@@ -1,8 +1,8 @@
 @font-face {font-family:"mario kart";src:url("./src/Mario-Kart-DS.woff2") format("woff2")}
 html {height:100%}
-body {height:100%;margin:0;position:relative;overflow:hidden;background-image:linear-gradient(0deg, #eff9ff, #4fb9ff);font-family:"mario kart",sans-serif}
+body {height:100%;margin:0;position:relative;overflow:hidden;background-image:linear-gradient(0deg, #eff9ff, #4fb9ff);font-family:"mario kart",sans-serif;content-visibility: auto}
 mapr {position:fixed;background-color:#159e28;left:-150%;right:-150%;top:0;bottom:0;height:1000px;width:1000px;z-index:-1;margin:auto auto 0;transform:perspective(560px) rotateX(80deg) translateZ(64px) translateY(50.2%)}
-map {height:1000em;width:1000em;display:block;font-size:1px;align-content:center;background-position:center;backface-visibility:hidden;background-image:url(./src/map-1c.png);background-size:1000em;background-repeat:no-repeat;transform:rotateZ(90deg) translate(170em, 700em);transition:transform 50ms;transform-origin:50% 50%}
+map {height:1000em;width:1000em;display:block;font-size:1px;align-content:center;background-position:center;backface-visibility:hidden;background-image:url(./src/map-1c.png);background-size:1000em;background-repeat:no-repeat;transform:rotateZ(90deg) translate(170em, 700em);transition:transform 75ms;transform-origin:50% 50%}
 .select-item {background-image:url(./src/selectIrem.png);width:1em;height:1em;background-size:contain;display:inline-block;background-repeat:no-repeat;position:absolute;font-size:110px;left:30px;top:30px}
 item {position:absolute;top:0.1em;bottom:0.1em;left:0.1em;right:0.1em;font-size:0.8em;background-image:url(./src/item.png);background-size:auto 1em;background-position-x:3em}
 #screen {top:0;left:0;right:0;bottom:0;position:absolute;z-index: 99;}
@@ -37,7 +37,9 @@ kart.mirror {transform:scale(3) translateZ(10px) scaleX(-1)}
     50% {opacity:0}
     100% {opacity:1}
 }
-.objet {display:block;background-size:cover;bottom:0;left:500%;right:0;top:auto;position:absolute;z-index:3;transition:left 50ms, bottom 50ms, transform 50ms}
+.objet {display:block;background-size:cover;bottom:0;left:500%;right:0;top:auto;position:absolute;z-index:3;
+    /*transition:left 50ms, bottom 50ms, transform 50ms*/
+}
 
 /*.objet {display:block;background-size:cover;bottom:0;left:500%;right:0;top:auto;position:absolute;z-index:3;transform:translate(-50%, 50%) scale(0.19682);transition:left .1s, bottom .1s, transform .1s;background-size:auto 50%;background-position:top;background-repeat:no-repeat}
 */
@@ -50,4 +52,59 @@ body.dev .objet:after {background-color:red;content:"";display:block;position:ab
 .resolution-fix {background:black;position:fixed;left:0;right:0;top:0;bottom:0;z-index:999999;color:white;font-size:3rem;display:flex;align-items:center;justify-content:center}
 @media screen and (min-height:640px) and (min-width:640px ) {
     .resolution-fix {display:none}
+}
+#pause {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 9999999;
+    background: rgb(0 0 0 / 40%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(6px);
+    display: none;
+    cursor: pointer;
+}
+.pause-menu {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 1rem 2rem;
+    border: 4px solid #c2c2c2;
+    border-right-color: #656565;
+    border-bottom-color: #656565;
+    background: #8f8f8f;
+    outline: 4px solid #000000;
+    color: white;
+}
+
+.pause-menu span {
+    font-size: 1.5rem;
+    padding: 0.3em 0.8em;
+    margin: 0.4em;
+    border: 4px solid #5187dd;
+    border-right-color: #012055;
+    border-bottom-color: #012055;
+    background: #1a68be;
+    outline: 4px solid black;
+}
+.pause-menu h3 {
+    font-weight: normal;
+    font-size: 1.5rem;
+    margin: 0.5em 0 1em;
+}
+.pause-menu span:hover {
+    border: 4px solid #2b589f;
+    border-right-color: #8db6ff;
+    border-bottom-color: #8db6ff;
+    background: #1c7ae0;
+}
+body.paused * {
+    animation-play-state: paused;
+}
+body.paused #pause{
+    display: flex;
 }
