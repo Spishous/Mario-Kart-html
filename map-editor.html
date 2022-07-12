@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Map Editor</title>
+    <style>
+        body {
+            background: #31435c;
+            margin: 0;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            right: 0;
+        }
+
+        .map-editor {
+            padding: 3em;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            position: relative;
+        }
+
+        img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            margin: auto;
+        }
+        tools {
+            height: 140px;
+            background: black;
+        }
+        map {
+            max-height: 100%;
+            margin: auto;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        objet {
+            position: absolute;
+            left: 0;
+            right: 0;
+            top: 0;
+            bottom: 0;
+            cursor: crosshair;
+        }
+        coin {
+            background: url(./src/coin-100.png);
+            font-size: 12px;
+            width: 1em;
+            height: 1em;
+            display: inline-block;
+            background-size: cover;
+            position: absolute;
+            transform: translate(-50%,-50%);
+        }
+        objet>*:hover {
+            border: 1px solid red;
+        }
+        box {
+            background: url(./src/box.png);
+            font-size: 15px;
+            width: 1em;
+            height: 1em;
+            display: inline-block;
+            background-size: cover;
+            position: absolute;
+            transform: translate(-50%,-50%);
+        }
+    </style>
+</head>
+<body>
+    <div class="map-editor">
+        <map>
+            <img id="map" src="./src/map-1c.png">
+            <objet>
+            </objet>
+        </map>
+    </div>
+    <tools>
+        <select name="selObj">
+            <option value="COIN">pieces</option>
+            <option value="BOX">box</option>
+        </select>
+        <button onclick="exportData()">Exporter les objets</button>
+        <textarea></textarea>
+    </tools>
+</body>
+<script>
+    let elMap=document.querySelector("map")
+    let objMap=document.querySelector("objet");
+    let scale=1;
+    objMap.addEventListener("wheel",function(e){
+        if(e.wheelDeltaY>0){
+            if(scale<3){
+                scale+=0.1
+            }
+        }else{
+            if(scale>0.3){
+                scale-=0.1
+            }
+        }
+        elMap.style.transform="scale("+scale+")";
+    })
+    objMap.addEventListener('click',function(e){
+        if(e.target.nodeName==="OBJET"){
+            let typeObj=document.querySelector("select[name=selObj]").value
+            let w=objMap.clientWidth,
+                h=objMap.clientHeight;
+            let obj=document.createElement(typeObj);
+            obj.style.left=((e.offsetX/w)*100)+"%";
+            obj.style.top=((e.offsetY/h)*100)+"%";
+            objMap.insertAdjacentElement("beforeend",obj)
+        }else{
+            e.target.remove();
+        }
+        document.querySelector("textarea").value=refreshJson();
+    })
+    function refreshJson(){
+        let list= [];
+        document.querySelectorAll("objet *").forEach((el)=>{
+            list.push({name:el.nodeName,x:parseFloat(el.style.left),y:parseFloat(el.style.top??0)})
+        })
+        list=JSON.stringify(list);
+        return list
+    }
+    function exportData(){
+        let list=refreshJson();
+        download(list, 'map-1.json', 'text/plain');
+    }
+    function download(content, fileName, contentType) {
+        var a = document.createElement("a");
+        var file = new Blob([content], {type: contentType});
+        a.href = URL.createObjectURL(file);
+        a.download = fileName;
+        a.click();
+    }
+</script>
+</html>
