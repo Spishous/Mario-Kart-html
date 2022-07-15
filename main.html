@@ -50,7 +50,7 @@
     <li id="s4" class="active">
         <h1>course</h1>
         <div class="center">
-            <div class="map" style="
+            <div  class="anime-zoom map" style="
     background-image: url(./src/list-map.png);
     height: 1em;
     width: 1em;
@@ -78,7 +78,7 @@
         yoshi: {sound:"yoshi-1",player:"yoshi"},
         toad: {sound:"toad-1",player:"toad"},
         bowser: {sound:"bowser-1",player:"bowser"},
-        koopatroopa: {sound:"",player:"koopatroopa"},
+        koopatroopa: {sound:"koopatroopa-1",player:"koopatroopa"},
         donkeykong: {sound:"donkeykong-1",player:"donkeykong"},
     }
     playerSelected="mario"
@@ -168,10 +168,11 @@
                 document.getElementById("kart").classList.value=playerSelected;
             }
         })
+
+        el.addEventListener("mouseleave",()=>{
+            el.classList.remove("hover")
+        })
         el.addEventListener("mouseenter",()=>{
-            document.querySelectorAll(".choice-kart .player").forEach(players=> {
-                players.classList.remove("hover")
-            })
             playSound('tic-1', 0.3, false)
             el.classList.add("hover")
         })
@@ -225,7 +226,7 @@
         document.querySelector("html").classList.remove('lost-focus')
     })
     function playSound(name,volume,loop=false,rate=1){
-        let audio = new Audio('./src/'+name+'.ogg');
+        let audio = new Audio('./src/audio/'+name+'.ogg');
         audio.playbackRate=rate;
         audio.loop=loop;
         audio.volume=volume

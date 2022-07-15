@@ -75,7 +75,8 @@ ul.smoke li:after {left:100%}
     from {opacity:1}
     to {opacity:0}
 }
-body.load:after {content:"";position:fixed;pointer-events:none;background:black;left:0;right:0;top:0;bottom:0;z-index:9999999999;animation:fade-out 2s forwards}
+body:after {content:"";position:fixed;pointer-events:none;background:black;left:0;right:0;top:0;bottom:0;z-index:9999999999;animation:fade-out 2s forwards}
+body.load:after {animation:none}
 @keyframes fade-out {
     from {opacity:1}
     to {opacity:0}
@@ -93,4 +94,162 @@ tree {
     width: 1em;
     background-image: url(../tree.png);
     top: 45%;
+}
+#lap {
+    color: white;
+    right: 1.5em;
+    top: 30px;
+    position: absolute;
+    font-size: 3rem;
+    text-shadow: -3px 0 black, 3px 0 black, 0 -3px black, 0 3px black;
+    white-space: break-spaces;
+    /* width: 9em; */
+}
+#screen .hide{
+    display: none;
+}
+grap {
+    display: block;
+    position: absolute;
+    background-image: url(../lakitu-grap.png);
+    width: 1em;
+    height: 1em;
+    background-size: cover;
+    top: 50%;
+    left: 0;
+    transform: translate(-48%,12%);
+    background-position-x: 4em;
+}
+lakitu {
+    background-image: url(../lakitu.png);
+    font-size: 10vh;
+    width: 1em;
+    height: 2em;
+    display: block;
+    position: absolute;
+    top: 40%;
+    background-size: cover;
+    left: 0;
+    right: 0;
+    margin: auto;
+    z-index: 4;
+    transition: transform 1s 1s;
+    transform: translate(-70vw,0);
+}
+lakitu.show{
+    transition: transform 1s;
+    transform: translate(-10vw,0);
+    animation: lakitu 600ms alternate infinite steps(1,end);
+}
+lakitu.started{
+    animation: lakitu 600ms alternate infinite steps(1,end), lakituStarted 0.2s 3.8s forwards steps(1,end)
+}
+@keyframes lakitu {
+    0%{
+        background-position-x: 0;
+    }
+    33%{
+        background-position-x: -1em;
+    }
+    70%{
+        background-position-x: -2em;
+    }
+}
+@keyframes lakituStarted {
+    from{
+        background-position-x: -3em;
+    }
+    to{
+        background-position-x: -4em;
+    }
+}
+lakitu.lap grap{
+    background-position-x: -1em;
+}
+lakitu.lap grap:before {
+    content: "";
+    background-image: url(../lakitu-lap.png);
+    width: 1em;
+    height: 1em;
+    display: block;
+    background-size: 700%;
+    font-size: 0.7em;
+    margin: 44% 17%;
+}
+lakitu.lap grap:after {
+    content: "";
+    background-image: url(../lakitu-lap.png);
+    width: 1em;
+    height: 1em;
+    background-size: 700%;
+    font-size: 0.7em;
+    margin: 44% 17%;
+    display: block;
+    visibility: hidden;
+    position: absolute;
+    top: 0;
+}
+grap.l5-5:before,grap.l4-5:before ,grap.l3-5:before ,grap.l2-5:before {background-position-x: -3em}
+grap.l4-4:before ,grap.l3-4:before ,grap.l2-4:before {background-position-x: -2em}
+grap.l3-3:before ,grap.l2-3:before {background-position-x: -1em}
+grap.l2-5:after ,grap.l2-4:after ,grap.l2-3:after {visibility: visible!important;background-position-x: -6em}
+grap.l3-5:after ,grap.l3-4:after{visibility: visible!important;background-position-x: -5em}
+grap.l2-3:after{visibility: visible!important;background-position-x: -4em}
+lakitu.start grap,lakitu.started grap{
+    background-position-x: 2em;
+}
+lakitu.start grap:before,lakitu.started grap:before {
+    background-image: url(../lakitu-start.png);
+    content: "";
+    display: block;
+    height: 1em;
+    width: 1em;
+    font-size: 0.75em;
+    margin: 43% 12%;
+    background-size: cover;
+    background-position-x: 0em;
+}
+lakitu.started grap:before {
+    animation: start-anim 4s steps(1,end) forwards;
+}
+@keyframes start-anim {
+    0%{background-position-x: 0em;}
+    25%{background-position-x: -1em;}
+    50%{background-position-x: -2em;}
+    75%{background-position-x: -3em;}
+    100%{background-position-x: -4em;}
+}
+@keyframes start-anim {
+    0%{background-position-x: 0em;}
+    25%{background-position-x: -1em;}
+    50%{background-position-x: -2em;}
+    75%{background-position-x: -3em;}
+    100%{background-position-x: -4em;}
+}
+lakitu.back grap{
+    background-position-x: -3em;
+}
+lakitu.back grap:before {
+    background-image: url(../lakitu-back.png);
+    content: "";
+    display: block;
+    height: 1em;
+    width: 1em;
+    font-size: 0.52em;
+    margin: 43% 23%;
+    background-size: 1000%;
+    background-position-x: 0em;
+    animation: back-anim 500ms steps(1,end) alternate infinite;
+}
+@keyframes back-anim {
+    0%{background-position-x: 0em;}
+    11%{background-position-x: -1em;}
+    22%{background-position-x: -2em;}
+    33%{background-position-x: -3em;}
+    44%{background-position-x: -4em;}
+    55%{background-position-x: -5em;}
+    66%{background-position-x: -6em;}
+    77%{background-position-x: -7em;}
+    88%{background-position-x: -8em;}
+    99%{background-position-x: -9em;}
 }

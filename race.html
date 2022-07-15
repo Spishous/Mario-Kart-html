@@ -13,10 +13,8 @@
     <title>Mario kart</title>
     <link rel="stylesheet" href="./src/css/mario-kart.css">
     <link rel="preload" as="image" href="./src/map-1c.png">
-    <link rel="preload" as="image" href="./src/map-1-mask.png">
 </head>
 <body class="tv load">
-<img src="./src/map-1-mask.png" id="mask" style="display: none">
 <div id="game">
     <coin class="objet" data-size="1" data-x="396" data-y="-16"></coin>
     <coin class="objet" data-size="1" data-x="450" data-y="-16"></coin>
@@ -42,21 +40,25 @@
         <ul class="smoke">
         </ul>
     </kart>
+    <lakitu class="">
+        <grap></grap>
+    </lakitu>
 </div>
 <div id="screen">
     <div class="select-item">
         <item></item>
     </div>
     <div id="timer">time    <span>0:00:000</span></div>
+    <div id="lap">lap    <span>1/3</span></div>
     <div id="rang"></div>
     <div id="info"></div>
 </div>
 <div id="pause">
     <div class="pause-menu">
         <h3>pause</h3>
-        <span onclick="pause(false)">reprendre</span>
-        <span onclick="recommencer()">recommencer</span>
-        <span onclick="quitter()">quitter</span>
+        <span onclick="game.pause(false)">reprendre</span>
+        <span onclick="game.recommencer()">recommencer</span>
+        <span onclick="game.quitter()">quitter</span>
     </div>
 </div>
 <div class="resolution-fix">ecran trop petit ..</div>

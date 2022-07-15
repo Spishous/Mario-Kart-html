@@ -4,12 +4,14 @@ let devmod=true,
     info="",
     contextCanvas = "",
     mapMask = new Image(),
-    toggleMusic=1,
+    toggleMusic=-1,
     contextAudio = new AudioContext(),
     TimeStartGame=Date.now(),
     listKeyPressed=[],
     onPause=false,
-    themeMusic = null
+    themeMusic=new Audio('./src/audio/music-map1.ogg');
+    themeMusic.loop=true;
+    themeMusic.volume=0.15
 
 mapMask.onload = () => {
     let canvas = document.createElement('canvas');
@@ -19,47 +21,10 @@ mapMask.onload = () => {
     contextCanvas.drawImage(mapMask, 0, 0);
 
 }
-mapMask.src = getBase64Image(document.getElementById("mask"));
+mapMask.src = "./src/map-1-mask.png";
 document.getElementsByTagName('map')[0].style.backgroundImage='url("./src/'+mapName+'c.png")'
-function getBase64Image(img) {
-    var canvas = document.createElement("canvas");
-    canvas.width = img.width;
-    canvas.height = img.height;
-    var ctx = canvas.getContext("2d");
-    ctx.drawImage(img, 0, 0);
-    var dataURL = canvas.toDataURL("image/png");
-    return dataURL;
-}
-function recommencer(){
-    location=".";
-}
 
-function quitter(){
-    location="main.html";
-}
-
-function pause(pause=onPause){
-    onPause=pause;
-    if(pause){
-        toggleMusic=1
-        themeMusic.pause();
-        TimeStartGame=Date.now()-TimeStartGame;
-        document.body.classList.add('paused')
-        player.pause();
-        music.playSound("menu1",0.5)
-    }else{
-        if(document.body.classList.contains('paused')){
-            toggleMusic=0;
-            themeMusic.play();
-            TimeStartGame=Date.now()-TimeStartGame;
-            document.body.classList.remove('paused')
-            player.resume();
-            music.playSound("menu2",0.5)
-        }
-    }
-}
-
-function loadSample(url) {
+/*function loadSample(url) {
     return fetch(url)
         .then(response => response.arrayBuffer())
         .then(buffer => contextAudio.decodeAudioData(buffer));
@@ -73,15 +38,8 @@ function playSample(sample, rate=0.1) {
     source.connect(contextAudio.destination);
     source.start(0);
     return source;
-}
+}*/
 
-function setTime(){
-    let now=Date.now()-TimeStartGame;
-    let ms=now.toString().slice(-3);
-    let sec=('0' + Math.floor(now/1000)%60).slice(-2);
-    let min= Math.floor(now/60000);
-    document.querySelector("#timer span").innerHTML=min+":"+sec+":"+ms
-}
 function updateKey(){
     player.pressTurn=0;
     player.pressAccelerate=0;
@@ -95,104 +53,237 @@ function updateKey(){
     }
 }
 document.addEventListener('keydown',function(e){
-    switch (e.key){
-        case "w":
-            localStorage.setItem("rotate",player.rotate.toString());
-            localStorage.setItem("posx",player.posx.toString());
-            localStorage.setItem("posy",player.posy.toString());
-            break;
-        case "a":
-            player.statechange=0;
-            break;
-        case "d":
-        case "ArrowRight":
-            listKeyPressed["q"]=0;
-            listKeyPressed["ArrowLeft"]=0;
-            break;
-        case "q":
-        case "ArrowLeft":
-            listKeyPressed["ArrowRight"]=0;
-            listKeyPressed["d"]=0;
-            break;
-        case "z":
-        case "ArrowUp":
-            listKeyPressed["ArrowDown"]=0;
-            listKeyPressed["s"]=0;
-            break;
-        case "s":
-        case "ArrowDown":
-            listKeyPressed["ArrowUp"]=0;
-            listKeyPressed["z"]=0;
-            break;
-        case " ":
-            if(!listKeyPressed[' ']){
-                let kart=document.querySelector("kart");
-                if(!player.onJump){
-                    player.onJump=true;
-                    player.drift=player.pressTurn;
-                    kart.classList.remove("jump");
-                    kart.clientHeight;
-                    kart.classList.add("jump");
-                    setTimeout(()=>{
-                        player.onJump=false;
+    if(game.playable){
+        switch (e.key){
+            case "w":
+                localStorage.setItem("rotate",player.rotate.toString());
+                localStorage.setItem("posx",player.posx.toString());
+                localStorage.setItem("posy",player.posy.toString());
+                break;
+            case "a":
+                player.statechange=0;
+                break;
+            case "d":
+            case "ArrowRight":
+                listKeyPressed["q"]=0;
+                listKeyPressed["ArrowLeft"]=0;
+                break;
+            case "q":
+            case "ArrowLeft":
+                listKeyPressed["ArrowRight"]=0;
+                listKeyPressed["d"]=0;
+                break;
+            case "z":
+            case "ArrowUp":
+                listKeyPressed["ArrowDown"]=0;
+                listKeyPressed["s"]=0;
+                break;
+            case "s":
+            case "ArrowDown":
+                listKeyPressed["ArrowUp"]=0;
+                listKeyPressed["z"]=0;
+                break;
+            case " ":
+                if(!listKeyPressed[' ']){
+                    let kart=document.querySelector("kart");
+                    if(!player.onJump){
+                        player.onJump=true;
+                        player.drift=player.pressTurn;
                         kart.classList.remove("jump");
-                    },500)
+                        kart.clientHeight;
+                        kart.classList.add("jump");
+                        setTimeout(()=>{
+                            player.onJump=false;
+                            kart.classList.remove("jump");
+                        },500)
+                    }
                 }
-            }
-            break;
-        case "e":
-            if(toggleMusic){
-                toggleMusic=0;
-                themeMusic=new Audio('./src/music-map1.ogg');
-                //kartEngine.volume=.2
-                //kartEngine.loop=true;
-                themeMusic.play();
-                //kartEngine.play();
-                themeMusic.volume=0.05
-            }else{
-                toggleMusic=1
-                themeMusic.pause();
-            }
-            break;
+                break;
+            case "e":
+                if(toggleMusic){
+                    toggleMusic=0;
+                    themeMusic=new Audio('./src/audio/music-map1.ogg');
+                    //kartEngine.volume=.2
+                    //kartEngine.loop=true;
+                    themeMusic.play();
+                    //kartEngine.play();
+                    themeMusic.volume=0.05
+                }else{
+                    toggleMusic=1
+                    themeMusic.pause();
+                }
+                break;
+        }
+        listKeyPressed[e.key]=1;
+        updateKey();
     }
-    listKeyPressed[e.key]=1;
-    updateKey();
 })
 window.addEventListener('blur',function(e){
-    toggleMusic=1
-    themeMusic.pause();
+    if(toggleMusic===0){
+        toggleMusic=1
+        themeMusic.pause();
+    }
+
 })
 window.addEventListener('focus',function(e){
-    toggleMusic=0
-    themeMusic.play();
+    if(toggleMusic===1) {
+        toggleMusic = 0
+        themeMusic.play();
+    }
 })
 document.addEventListener('keyup',function(e){
-    if(e.key===" "){
-        player.drift=0;
-    }
-    if(e.key==="Escape"){
-        onPause=!onPause;
-        pause(onPause);
-    }
-    listKeyPressed[e.key]=0;
-    updateKey();
-})
-document.addEventListener('click',()=>{
-    if(!firstInteract){
-        firstInteract=true;
-        if(devmod) music.playSound("start-race",0.2)
+    if(game.playable) {
+        if (e.key === " ") {
+            player.drift = 0;
+        }
+        if (e.key === "Escape") {
+            onPause = !onPause;
+            game.pause(onPause);
+        }
+        listKeyPressed[e.key] = 0;
+        updateKey();
     }
 })
 
-setTimeout(()=>{
-    document.body.classList.remove("load");
-},2000)
+class game {
+    static playable=false;
+    static initGame(){
+        screen.updateShowing();
+        game.startGame();
+    }
+    static enablePlay(playable=true){
+        game.playable=playable;
+    }
+    static startGame(){
+        game.lakituStart();
+        game.lakituShow();
+        setTimeout(()=>{
+            game.lakituStarted();
+            game.startBip();
+            setTimeout(()=>{
+                game.enablePlay()
+                toggleMusic=0;
+                themeMusic.play();
+                game.lakituHide();
+            },4000)
+        },1500)
+    }
+    static startBip(count=0){
+        setTimeout(()=>{
+            if(count<3){
+                game.bip()
+                game.startBip(count+1)
+            }
+            else{
+                game.bip(true)
+            }
+        },1000)
+    }
+    static bip(final=false){
+        if(final){
+            music.playSound("start-race-bip2",0.1)
+        }else{
+            music.playSound("start-race-bip1",0.15)
+        }
+    }
+    static lakituStart(){
+        let lakitu=document.querySelector("lakitu")
+        lakitu.classList.value="start";
+    }
+    static lakituStarted(){
+        let lakitu=document.querySelector("lakitu")
+        lakitu.classList.value="started show";
+    }
+    static lakituGrap(){
+        let lakitu=document.querySelector("lakitu")
+        lakitu.classList.value="grap";
+    }
+    static lakituBack(){
+        let lakitu=document.querySelector("lakitu")
+        lakitu.classList.value="back";
+    }
+    static lakituLap(lap=2,max=2){
+        let lakitu=document.querySelector("lakitu")
+        lakitu.classList.value="lap";
+        lakitu.querySelector("grap").classList.value="l"+lap+"-"+max;
+    }
+    static lakituShow(){
+        let lakitu=document.querySelector("lakitu")
+        lakitu.classList.add("show")
+    }
+    static lakituHide(){
+        let lakitu=document.querySelector("lakitu")
+        lakitu.classList.remove("show")
+    }
+    static recommencer(){
+        location="race.html";
+    }
+
+    static quitter(){
+        location="main.html";
+    }
+
+    static pause(pause=onPause){
+        onPause=pause;
+        if(pause){
+            game.playable=false;
+            toggleMusic=1
+            themeMusic.pause();
+            TimeStartGame=Date.now()-TimeStartGame;
+            document.body.classList.add('paused')
+            player.pause();
+            music.playSound("menu1",0.5)
+        }else{
+            if(document.body.classList.contains('paused')){
+                game.playable=true;
+                toggleMusic=0;
+                themeMusic.play();
+                TimeStartGame=Date.now()-TimeStartGame;
+                document.body.classList.remove('paused')
+                player.resume();
+                music.playSound("menu2",0.5)
+            }
+        }
+    }
+}
+
+class screen{
+    static enableTime=false;
+    static enableLap=true;
+    static elLap=document.querySelector("#screen #lap span");
+    static elTime=document.querySelector("#screen #timer span");
+    static updateShowing(){
+        if(!screen.elTime.parentNode.classList.contains("hide") && !screen.enableTime)
+            screen.elTime.parentElement.classList.add("hide")
+        if(screen.elTime.parentElement.classList.contains("hide") && screen.enableTime)
+            screen.elTime.parentElement.classList.remove("hide")
+        if(!screen.elLap.parentElement.classList.contains("hide") && !screen.enableLap)
+            screen.elLap.parentElement.classList.add("hide")
+        if(screen.elLap.parentElement.classList.contains("hide") && screen.enableLap)
+            screen.elLap.parentElement.classList.remove("hide")
+    }
+    static setTime(){
+        if(!screen.enableTime) return;
+        let now=Date.now()-TimeStartGame;
+        let ms=now.toString().slice(-3);
+        let sec=('0' + Math.floor(now/1000)%60).slice(-2);
+        let min= Math.floor(now/60000);
+        screen.elTime.innerHTML=min+":"+sec+":"+ms
+    }
+    static lap(player){
+        if(!screen.enableLap) return;
+        if(screen.elLap){
+            screen.elLap.innerText=player.lap+"/"+map.nbLap;
+        }
+    }
+}
 
 class map{
     static mapName="map-1";
     static elMap=null;
     static mapLoaded=false;
     static lapList=[];
+    static nbLap=3;
     static loadMapObj(){
         map.elMap=document.querySelector("map");
         map.readJsonFile(map.mapName,(data)=>{
@@ -240,10 +331,10 @@ class music {
     static listPlayer={};
     static playSound(name, volume, rate = 1) {
         if(!music.listPlayer[name]){
-            music.listPlayer[name]=new Audio('./src/' + name + '.ogg');
+            music.listPlayer[name]=new Audio('./src/audio/' + name + '.ogg');
         }else{
             if(music.listPlayer[name].played){
-                let audio = new Audio('./src/' + name + '.ogg');
+                let audio = new Audio('./src/audio/' + name + '.ogg');
                 audio.playbackRate = rate;
                 audio.volume = volume
                 audio.play();
@@ -283,12 +374,11 @@ class bloc{
             let pickx=Math.round((1000-(posx+500))*1.024),
                 picky=Math.round((1000-(posy+500))*1.025),
                 current=bloc.DataToHex(contextCanvas.getImageData(pickx,picky, 1, 1).data);
-            return listType[current]??"unknow floor";
+            return listType[current]??"unknown floor";
         }
     }
     static isCanvasSet(){
         if(!contextCanvas){
-            mapMask.src = getBase64Image(document.getElementById("mask"));
             return false;
         }
         return true;
@@ -335,31 +425,22 @@ class kart{
     map=document.querySelector('map');
     loopRefresh=null;
     constructor(){
+        screen.lap(this);
         document.querySelector("player").classList.add(localStorage.getItem("player"));
         this.pause();
         this.resume();
-        if(!firstInteract){
-            firstInteract=true;
-            music.playSound("start-race",0.2)
-            setTimeout(()=>{
-                toggleMusic=0;
-                themeMusic=new Audio('./src/music-map1.ogg');
-                themeMusic.loop=true;
-                themeMusic.play();
-                themeMusic.volume=0.1
-            },3000)
-        }
     }
     pause(){
         this.endRefresh();
     }
     resume(){
+        this.dTime=Date.now();
         this.loopRefresh=setInterval(() => {
             this.fixLag=(Date.now()-this.dTime)/25;
             this.dTime=Date.now();
             /*if(0 && !this.engineSound && firstInteract){
                 this.engineSound=1
-                loadSample('./src/engine3.ogg')
+                loadSample('./src/audio/engine3.ogg')
                     .then(sample => {
                         this.engineSound=playSample(sample)
                         this.engineSound.playbackRate.value = 2;
@@ -369,7 +450,7 @@ class kart{
                 this.statechange=1;
                 this.itemChangement()
                 this.refresh();
-                setTime();
+                screen.setTime();
                 if(this.engineSound && this.engineSound!==1) this.engineSound.playbackRate.value=Math.abs(this.vitesse/5)+0.3;
                 if(devmod) {
                     info="posx: "+this.posx+
@@ -416,6 +497,7 @@ class kart{
         }else{
             if(this.floor==="lap"){
                 player.lap++;
+                screen.lap(this);
                 this.stepLap=0;
             }
         }
@@ -638,3 +720,13 @@ class kart{
     }
 }
 let player=new kart();
+window.onload=()=>{
+    setTimeout(()=>{
+        game.initGame();
+        if(!firstInteract){
+            firstInteract=true;
+            music.playSound("start-race",0.2)
+        }
+        document.body.classList.remove("load");
+    },10)
+}

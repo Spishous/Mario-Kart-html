@@ -44,7 +44,7 @@ nav *{font-size:1.8rem;padding:0.3em 0.8em;border:4px solid #5187dd;border-right
 #kart.donkeykong{background-image:url(../player-donkeykong.png)}
 #kart.koopatroopa{background-image:url(../player-koopatroopa.png)}
 .choice-kart {width:3em;font-size:90px}
-.choice-kart .player {display:inline-block;background-image:url(../list-player.png);width:1em;height:1em;background-size:auto 300%;margin:-5px;position: relative}
+.choice-kart .player {display:inline-block;background-image:url(../list-player.png);width:1em;height:1em;background-size: auto 400%;margin:-5px;position: relative}
 .player.mario {background-position:0em 0em}
 .player.luigi {background-position:-1em 0em}
 .player.princess {background-position:-2em 0em}
@@ -52,7 +52,7 @@ nav *{font-size:1.8rem;padding:0.3em 0.8em;border:4px solid #5187dd;border-right
 .player.bowser {background-position:-2em -1em}
 .player.donkeykong {background-position:-3em -1em}
 .player.toad {background-position:0em -1em}
-.player.koopatroopa {background-position:-1em -2em}
-.player.koopatroopa {filter: grayscale(1);pointer-events: none;}
+.player.koopatroopa {background-position: -1em -3em;}
+.player.koopatroopa {/* filter: grayscale(1); *//* pointer-events: none; */}
 .player.active:after {content:"";background:url('../selector.png') no-repeat;display:block;position:absolute;top:-4px;bottom:-1px;left:-4px;right:-1px;background-size:contain}
 .player.hover{background-image:url('../list-player2.png')}
