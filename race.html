@@ -11,10 +11,12 @@
     <meta http-equiv="expires" content="Tue, 01 Jan 1980 1:00:00 GMT" />
     <meta http-equiv="pragma" content="no-cache" />
     <title>Mario kart</title>
-    <link rel="stylesheet" href="mario-kart.css">
+    <link rel="stylesheet" href="./src/css/mario-kart.css">
     <link rel="preload" as="image" href="./src/map-1c.png">
+    <link rel="preload" as="image" href="./src/map-1-mask.png">
 </head>
 <body class="tv load">
+<img src="./src/map-1-mask.png" id="mask" style="display: none">
 <div id="game">
     <coin class="objet" data-size="1" data-x="396" data-y="-16"></coin>
     <coin class="objet" data-size="1" data-x="450" data-y="-16"></coin>
@@ -58,6 +60,6 @@
     </div>
 </div>
 <div class="resolution-fix">ecran trop petit ..</div>
-<script src="script.js"></script>
+<script src="./src/js/script.js"></script>
 </body>
 </html>

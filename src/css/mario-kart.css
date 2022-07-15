@@ -1,0 +1,96 @@
+@font-face {font-family:"mario kart";src:url("../font-Mario-Kart.woff2") format("woff2")}
+html {height:100%}
+body {height:100%;margin:0;position:relative;overflow:hidden;background-image:linear-gradient(0deg, #eff9ff, #4fb9ff);font-family:"mario kart",sans-serif;content-visibility:auto}
+mapr {position:fixed;background-color:#159e28;left:-150%;right:-150%;top:0;bottom:0;height:1000px;width:1000px;z-index:-1;margin:auto auto 0;transform:perspective(560px) rotateX(80deg) translateZ(64px) translateY(50.2%)}
+map {height:1000em;width:1000em;display:block;font-size:1px;align-content:center;background-position:center;backface-visibility:hidden;background-image:url(../map-1c.png);background-size:1000em;background-repeat:no-repeat;transform:rotateZ(90deg) translate(170em, 700em);transition:transform 75ms;transform-origin:50% 50%}
+.select-item {background-image:url(../selectIrem.png);width:1em;height:1em;background-size:contain;display:inline-block;background-repeat:no-repeat;position:absolute;font-size:110px;left:30px;top:30px}
+item {position:absolute;top:0.1em;bottom:0.1em;left:0.1em;right:0.1em;font-size:0.8em;background-image:url(../item.png);background-size:auto 1em;background-position-x:3em}
+#screen {top:0;left:0;right:0;bottom:0;position:absolute;z-index:99;pointer-events:none}
+#timer {color:white;right:30px;top:30px;position:absolute;font-size:2.5rem;text-shadow:-3px 0 black, 3px 0 black, 0 -3px black, 0 3px black;white-space:break-spaces;width:9em}
+coin {font-size:64px;height:1em;width:1em;background-image:url(../coin-100.png);top:45%;animation:coin infinite 800ms steps(1, end)}
+box {font-size:100px;height:1em;width:1em;background-image:url(../box.png);top:45%;animation:box infinite ease-in-out 1s}
+kart {position:absolute;left:0;right:0;margin:auto auto 0;top:0;bottom:250px;display:block;font-size:33px;width:1em;height:1em;z-index:2;transform:scale(3) translateZ(10px)}
+kart player {background-image:url(../player-mario.png);display:block;width:1em;height:1em;background-position:-1em 0em;background-size:1200%}
+player.luigi {background-image:url(../player-luigi.png)}
+player.princess {background-image:url(../player-princess.png)}
+player.toad {background-image:url(../player-toad.png)}
+player.yoshi {background-image:url(../player-yoshi.png)}
+player.bowser {background-image:url(../player-bowser.png)}
+player.donkeykong {background-image:url(../player-donkeykong.png)}
+player.koopatroopa {background-image:url(../player-koopatroopa.png)}
+kart:before {content:"";display:inline-block;position:absolute;height:10px;width:1em;left:0;right:0;margin:auto;background:#262626;filter:blur(2px);border-radius:100%;bottom:0px;z-index:-1}
+kart.jump player {animation:jump 500ms forwards;animation-timing-function:cubic-bezier(0.42, 0, 0.49, 1.32)}
+kart.mirror mirror {transform:scaleX(-1);display:block}
+@keyframes box {
+    0% {margin-bottom:2px}
+    50% {margin-bottom:-2px}
+    100% {margin-bottom:2px}
+}
+@keyframes coin {
+    0% {background-position-x:0em}
+    20% {background-position-x:1em}
+    40% {background-position-x:2em}
+    60% {background-position-x:4em}
+    80% {background-position-x:5em}
+}
+@keyframes jump {
+    0% {transform:translateY(0px)}
+    50% {transform:translateY(-15px)}
+    100% {transform:translateY(0px)}
+}
+.strobe {animation:strobe 300ms 5 forwards steps(1,end)}
+@keyframes strobe {
+    0% {opacity:1}
+    50% {opacity:0}
+    100% {opacity:1}
+}
+.objet {display:block;background-size:cover;bottom:0;left:500%;right:0;top:auto;position:absolute;z-index:3;
+    /*transition:left 50ms, bottom 50ms, transform 50ms*/
+}
+
+/*.objet {display:block;background-size:cover;bottom:0;left:500%;right:0;top:auto;position:absolute;z-index:3;transform:translate(-50%, 50%) scale(0.19682);transition:left .1s, bottom .1s, transform .1s;background-size:auto 50%;background-position:top;background-repeat:no-repeat}
+*/
+#info {bottom:20px;position:absolute;right:20px;white-space:break-spaces;text-align:end}
+#rang {background-image:url(../rang.png);bottom:20px;left:20px;position:absolute;height:1em;width:1em;font-size:134px;transform:scale(0.9)}
+body.tv {max-width:160vh;margin:auto;outline:25vw solid black}
+body.load * {transition:none!important}
+body.dev .objet:after {background-color:red;content:"";display:block;position:absolute;left:0;right:0;top:0;bottom:0;margin:auto;font-size:5px;height:1em;width:1em}
+.resolution-fix {background:black;position:fixed;left:0;right:0;top:0;bottom:0;z-index:999999;color:white;font-size:3rem;display:flex;align-items:center;justify-content:center}
+@media screen and (min-height:640px) and (min-width:640px ) {
+    .resolution-fix {display:none}
+}
+#pause {position:fixed;top:0;bottom:0;left:0;right:0;z-index:9999999;background:rgba(0,0,0,0.40);display:flex;align-items:center;justify-content:center;backdrop-filter:blur(6px);display:none;cursor:pointer}
+.pause-menu {display:flex;flex-direction:column;align-items:center;padding:1rem 2rem;border:4px solid #c2c2c2;border-right-color:#656565;border-bottom-color:#656565;background:#8f8f8f;outline:4px solid #000000;color:white}
+.pause-menu span {font-size:1.5rem;padding:0.3em 0.8em;margin:0.4em;border:4px solid #5187dd;border-right-color:#012055;border-bottom-color:#012055;background:#1a68be;outline:4px solid black}
+.pause-menu h3 {font-weight:normal;font-size:1.5rem;margin:0.5em 0 1em}
+.pause-menu span:hover {border:4px solid #2b589f;border-right-color:#8db6ff;border-bottom-color:#8db6ff;background:#1c7ae0}
+body.paused * {animation-play-state:paused}
+body.paused #pause {display:flex}
+ul.smoke {padding:0;margin:0 22%;top:-5px;list-style:none;position:relative}
+ul.smoke li {display:flex;position:absolute;opacity:0.5;width:100%;top:0;left:0;animation:fade-out 500ms forwards}
+ul.smoke li:before, ul.smoke li:after {content:"";background-image:url(../smoke-2.png);width:1em;height:1em;font-size:25px;background-position-x:0;display:block;background-size:cover;position:absolute;top:0;transform:translate(-50%,-50%)}
+ul.smoke li.r:before, ul.smoke li.r:after {background-position-x:1em}
+ul.smoke li:after {left:100%}
+@keyframes fade-out {
+    from {opacity:1}
+    to {opacity:0}
+}
+body.load:after {content:"";position:fixed;pointer-events:none;background:black;left:0;right:0;top:0;bottom:0;z-index:9999999999;animation:fade-out 2s forwards}
+@keyframes fade-out {
+    from {opacity:1}
+    to {opacity:0}
+}
+pipe {
+    font-size: 100px;
+    height: 2em;
+    width: 1em;
+    background-image: url(../pipe.png);
+    top: 45%;
+}
+tree {
+    font-size: 300px;
+    height: 2em;
+    width: 1em;
+    background-image: url(../tree.png);
+    top: 45%;
+}

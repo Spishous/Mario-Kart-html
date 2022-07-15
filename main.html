@@ -6,200 +6,7 @@
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Menu principal</title>
-    <style>
-        @font-face {font-family:"mario kart";src:url("./src/Mario-Kart-DS.woff2") format("woff2")}
-        html {
-            cursor: none;
-        }
-        body {
-            margin: 0;
-            height: 100vh;
-            overflow: hidden;
-            font-family: "mario kart",sans-serif;
-            background: linear-gradient(0deg,#cbe1ff, #6d97c7, #005ec9, #004494);
-            color: white;
-            position: relative;
-        }
-        body:before {
-            content: "";
-            position: absolute;
-            background-image: url(./src/grid.png);
-            background-size: 100px;
-            background-position: top;
-            top: 0;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            z-index: -1;
-        }
-        cursor {
-            position: fixed;
-            background: url(./src/hand.png);
-            font-size: 50px;
-            height: 1em;
-            width: 1em;
-            background-size: 2em;
-            pointer-events: none;
-        }
-        cursor.clic{
-            background-position-x: 1em;
-        }
-        h1 {
-            font-size: 3.5em;
-            margin-top: 2em;
-        }
-        * {
-            user-select: none;
-        }
-        ul {
-            position: absolute;
-            left: 0;
-            right: 0;
-            top: 0;
-            bottom: 0;
-            padding: 0;
-            list-style: none;
-        }
-        li.active ~ li {
-            opacity: 0;
-            transform: translateX(50%);
-            pointer-events: none;
-        }
-        li.active {
-            opacity: 1;
-            transform: translateX(0);
-            pointer-events: all;
-        }
-        li {
-            opacity: 0;
-            display: flex;
-            transform: translate(-50%);
-            left: 0;
-            right: 0;
-            top: 0;
-            bottom: 0;
-            align-items: center;
-            flex-direction: column;
-            position: absolute;
-            pointer-events: none;
-            transition: transform 500ms,opacity 500ms;
-        }
-        #section li.center {
-            justify-content: center;
-            padding-bottom: 10em;
-        }
-        li.center h1 {
-            margin: 0.5em 0;
-        }
-        .anime-zoom{
-            animation: zoom 600ms infinite alternate;
-        }
-        @keyframes zoom {
-            from{
-                transform: scale(1);
-            }
-            to{
-                transform: scale(1.1);
-            }
-        }
-        .double-text {
-            position: relative;
-            font-weight: normal;
-            letter-spacing: 0.108em;
-            white-space: pre;
-            font-size: 64px;
-            color: #9cddff;
-        }
-        .double-text span {
-            position: absolute;
-            left: -1%;
-            text-transform: uppercase;
-            color: #0d3d83;
-            letter-spacing: -1px;
-        }
-        credit {
-            position: fixed;
-            bottom: 1em;
-            right: 2em;
-            color: black;
-            font-size: 1.8rem;
-            white-space: pre;
-            pointer-events: none;
-        }
-        .choice #less {
-            transform: scale(-1);
-        }
-        .choice #less, .choice #more {
-            height: 1em;
-            width: 1em;
-            display: inline-flex;
-            background-image: url(./src/btn-arrow.png);
-            background-size: 1em;
-            padding: 1em;
-            background-repeat: no-repeat;
-            background-position: center;
-        }
-        li>.center {
-            flex: 0.7;
-            display: flex;
-            align-items: center;
-        }
-        #level {
-            background: url(./src/level.png);
-            width: 1em;
-            height: 1em;
-            display: inline-flex;
-            background-size: cover;
-            font-size: 3em;
-        }
-        .choice {
-            font-size: 4rem;
-            display: flex;
-            align-items: center;
-        }
-        .next {
-            font-size: 1.8rem;
-            margin: 0 20% 0 auto;
-            padding: 0.3em 0.8em;
-            border: 4px solid #5187dd;
-            border-right-color: #012055;
-            border-bottom-color: #012055;
-            background: #0d4096;
-            outline: 4px solid black;
-        }
-        #black-mask:after {
-            background-image: url(./src/back-mask.png);
-            content: "";
-            position: absolute;
-            top: 100%;
-            height: 1em;
-            background-size: auto 1em;
-            font-size: 4rem;
-            width: 100%;
-            display: block;
-        }
-        #black-mask {
-            width: 100%;
-            z-index: 9;
-            top: 0;
-            bottom: 100%;
-            background: black;
-            position: fixed;
-            transform: translateY(-1em);
-            font-size: 4rem;
-            transition: bottom 1s cubic-bezier(0.68, 0.06, 1, 0.78);
-        }
-        #black-mask.show {
-            bottom: -1em;
-        }
-        .kart {
-            font-size: 8rem;
-            background-image: url(./src/kart-sprite.png);
-            height: 1em;
-            width: 1em;
-            background-size: 700% auto;
-        }
-    </style>
+    <link rel="stylesheet" href="./src/css/main.css">
 </head>
 <body>
 <ul id="section">
@@ -215,20 +22,36 @@
                 <span id="more" data-element="level"></span>
             </div>
         </div>
-        <div class="next">suivant</div>
+        <nav>
+            <div class="prev">retour</div>
+            <div class="next">suivant</div>
+        </nav>
     </li>
     <li id="s3" class="active">
         <h1>personnage</h1>
         <div class="center">
-            <div class="kart"></div>
+            <div class="choice-kart">
+                <span class="player mario active" data-value="mario"></span>
+                <span class="player luigi" data-value="luigi"></span>
+                <span class="player princess" data-value="princess"></span>
+                <span class="player toad" data-value="toad"></span>
+                <span class="player yoshi" data-value="yoshi"></span>
+                <span class="player bowser" data-value="bowser"></span>
+                <span class="player donkeykong" data-value="donkeykong"></span>
+                <span class="player koopatroopa" data-value="koopatroopa"></span>
+            </div>
+            <div id="kart" data-p="1"></div>
         </div>
-        <div class="next">suivant</div>
+        <nav>
+            <div class="prev">retour</div>
+            <div id="course" class="next">suivant</div>
+        </nav>
     </li>
     <li id="s4" class="active">
         <h1>course</h1>
         <div class="center">
             <div class="map" style="
-    background-image: url(./src/map-list.png);
+    background-image: url(./src/list-map.png);
     height: 1em;
     width: 1em;
     font-size: 8em;
@@ -236,7 +59,10 @@
 ">
             </div>
         </div>
-        <div id="run" class="next">demarrer</div>
+        <nav>
+            <div class="prev">retour</div>
+            <div id="run" class="next">demarrer</div>
+        </nav>
     </li>
 </ul>
 
@@ -245,6 +71,17 @@
 <div id="black-mask"></div>
 <script>
     let mainTheme=null;
+    let playerList= {
+        mario: {sound:"mario-1",player:"mario"},
+        luigi: {sound:"luigi-1",player:"luigi"},
+        princess: {sound:"peach-1",player:"princess"},
+        yoshi: {sound:"yoshi-1",player:"yoshi"},
+        toad: {sound:"toad-1",player:"toad"},
+        bowser: {sound:"bowser-1",player:"bowser"},
+        koopatroopa: {sound:"",player:"koopatroopa"},
+        donkeykong: {sound:"donkeykong-1",player:"donkeykong"},
+    }
+    playerSelected="mario"
     let cursor=document.getElementsByTagName("cursor")[0]
     cursor.style.left="-50px";
     cursor.style.top="-50px";
@@ -254,21 +91,41 @@
     })
 
     let firstInteract=0;
-    document.querySelectorAll(".next").forEach(el=> {
+    document.querySelectorAll("nav .next").forEach(el=> {
             el.addEventListener("click",()=>{
-                if(el.id!=="run") {
-                    el.parentElement.classList.remove('active')
-                    playSound('select', 0.3, false)
-                }else{
-                    playSound('startmenu', 0.25, false)
-                    mainTheme.pause();
-                    document.querySelector("#black-mask").classList.add('show')
-                    setTimeout(()=>{
-                        location = "index.html";
-                    },1300)
-
+                localStorage.setItem("player",playerSelected);
+                switch(el.id) {
+                    case "run":
+                        playSound('startmenu', 0.25, false)
+                        mainTheme.pause();
+                        document.querySelector("#black-mask").classList.add('show')
+                        setTimeout(() => {
+                            location = "race.html";
+                        }, 1300)
+                        return;
+                    case "course":
+                        playSound('voice/' + playerList[playerSelected].sound, 0.25, false)
+                        break;
                 }
+                el.parentElement.parentElement.classList.remove('active')
+                playSound('select', 0.3, false)
             })
+    })
+    document.querySelectorAll("nav .prev").forEach(el=> {
+        el.addEventListener("click",(e)=>{
+            let childList=document.querySelector("ul").children,
+                parent=el.parentElement.parentElement,
+                l=childList.length;
+            for(let i=0;i<l;i++){
+                if(childList[i].id===parent.id){
+                    setTimeout(()=>{
+                        childList[i-1].classList.add('active')
+                        playSound('prev', 0.3, false)
+                    },20)
+                    return;
+                }
+            }
+        })
     })
     document.querySelectorAll(".choice #less").forEach(el=> {
         el.addEventListener('click', function(e){
@@ -298,7 +155,43 @@
             obj.style.backgroundPositionX="-"+value+"em";
         })
     })
-
+    document.querySelectorAll(".choice-kart .player").forEach(el=> {
+        el.addEventListener("click",()=>{
+            document.querySelectorAll(".choice-kart .player").forEach(players=> {
+                players.classList.remove("active")
+            })
+            playerSelected=el.dataset.value;
+            if(playerList[playerSelected]){
+                localStorage.setItem("player",playerSelected);
+                playSound('choose-option1',0.3,false)
+                el.classList.add("active")
+                document.getElementById("kart").classList.value=playerSelected;
+            }
+        })
+        el.addEventListener("mouseenter",()=>{
+            document.querySelectorAll(".choice-kart .player").forEach(players=> {
+                players.classList.remove("hover")
+            })
+            playSound('tic-1', 0.3, false)
+            el.classList.add("hover")
+        })
+    })
+    let stepAnim=0;
+    setInterval(()=>{
+        let kart=document.getElementById("kart");
+        stepAnim++
+        if(stepAnim>=22){
+            stepAnim=0
+        }
+        let index=stepAnim,
+            mirror=1;
+        if(index>=11){
+            index=11 - index%11;
+            mirror=-1;
+        }
+        kart.style.transform="scaleX("+mirror+")";
+        kart.style.backgroundPosition=-index+"em -1em"
+    },100)
     document.addEventListener('mousedown',()=>{
         if(!cursor.classList.contains("clic")) cursor.classList.add('clic')
     })
@@ -316,11 +209,20 @@
             mainTheme=playSound('main-theme',0.07,true)
         }
     })
-    document.querySelectorAll("ul li").forEach(()=>{
+    document.querySelectorAll("ul li").forEach((el)=>{
+        el.classList.add("active")
         if(!firstInteract){
             firstInteract++;
             mainTheme=playSound('main-theme',0.07,true)
         }
+    })
+    window.addEventListener('blur',()=>{
+        mainTheme.pause();
+        document.querySelector("html").classList.add('lost-focus')
+    })
+    window.addEventListener('focus',()=>{
+        mainTheme.play();
+        document.querySelector("html").classList.remove('lost-focus')
     })
     function playSound(name,volume,loop=false,rate=1){
         let audio = new Audio('./src/'+name+'.ogg');
