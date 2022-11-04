@@ -217,11 +217,11 @@ class game {
         lakitu.classList.remove("show")
     }
     static recommencer(){
-        location="race.html";
+        location="https://htmlpreview.github.io/?https://github.com/Spishous/Mario-Kart-html/main/demo/race.html";
     }
 
     static quitter(){
-        location="main.html";
+        location="https://htmlpreview.github.io/?https://github.com/Spishous/Mario-Kart-html/main/demo/main.html";
     }
 
     static pause(pause=onPause){
@@ -721,13 +721,17 @@ class kart{
     }
 }
 let player=new kart();
-window.onload=()=>{
-    setTimeout(()=>{
-        game.initGame();
-        if(!firstInteract){
-            firstInteract=true;
-            music.playSound("start-race",0.2)
-        }
-        document.body.classList.remove("load");
-    },10)
-}
+let firstClick=true;
+document.addEventListener("click",function(){
+    if(firstClick){
+        firstClick=false;
+        setTimeout(()=>{
+            game.initGame();
+            if(!firstInteract){
+                firstInteract=true;
+                music.playSound("start-race",0.2)
+            }
+            document.body.classList.remove("load");
+        },10)
+    }
+})
