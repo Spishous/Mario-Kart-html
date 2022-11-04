@@ -12,6 +12,7 @@ let devmod=true,
     themeMusic=new Audio('./src/audio/music-map1.ogg');
     themeMusic.loop=true;
     themeMusic.volume=0.15
+    mapMask.crossOrigin = "Anonymous";
 
 mapMask.onload = () => {
     let canvas = document.createElement('canvas');
