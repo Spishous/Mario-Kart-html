@@ -1,0 +1,239 @@
+<!doctype html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Menu principal</title>
+    <link rel="stylesheet" href="./src/css/main.css">
+</head>
+<body>
+<ul id="section">
+    <li id="s1" class="center active">
+        <h1 class="anime-zoom double-text">mario kart web<span>mario  kart  web</span></h1>
+    </li>
+    <li id="s2" class="active">
+        <h1>niveau</h1>
+        <div class="center">
+            <div class="choice">
+                <span id="less" data-element="level"></span>
+                <span id="level" min="0" max="3" value="0" class="anime-zoom"></span>
+                <span id="more" data-element="level"></span>
+            </div>
+        </div>
+        <nav>
+            <div class="prev">retour</div>
+            <div class="next">suivant</div>
+        </nav>
+    </li>
+    <li id="s3" class="active">
+        <h1>personnage</h1>
+        <div class="center">
+            <div class="choice-kart">
+                <span class="player mario active" data-value="mario"></span>
+                <span class="player luigi" data-value="luigi"></span>
+                <span class="player princess" data-value="princess"></span>
+                <span class="player toad" data-value="toad"></span>
+                <span class="player yoshi" data-value="yoshi"></span>
+                <span class="player bowser" data-value="bowser"></span>
+                <span class="player donkeykong" data-value="donkeykong"></span>
+                <span class="player koopatroopa" data-value="koopatroopa"></span>
+            </div>
+            <div id="kart" data-p="1"></div>
+        </div>
+        <nav>
+            <div class="prev">retour</div>
+            <div id="course" class="next">suivant</div>
+        </nav>
+    </li>
+    <li id="s4" class="active">
+        <h1>course</h1>
+        <div class="center">
+            <div  class="anime-zoom map" style="
+    background-image: url(./src/list-map.png);
+    height: 1em;
+    width: 1em;
+    font-size: 8em;
+    background-size: auto 200%;
+">
+            </div>
+        </div>
+        <nav>
+            <div class="prev">retour</div>
+            <div id="run" class="next">demarrer</div>
+        </nav>
+    </li>
+</ul>
+
+<credit>lucas  rayan</credit>
+    <cursor></cursor>
+<div id="black-mask"></div>
+<script>
+    let mainTheme=null;
+    let playerList= {
+        mario: {sound:"mario-1",player:"mario"},
+        luigi: {sound:"luigi-1",player:"luigi"},
+        princess: {sound:"peach-1",player:"princess"},
+        yoshi: {sound:"yoshi-1",player:"yoshi"},
+        toad: {sound:"toad-1",player:"toad"},
+        bowser: {sound:"bowser-1",player:"bowser"},
+        koopatroopa: {sound:"koopatroopa-1",player:"koopatroopa"},
+        donkeykong: {sound:"donkeykong-1",player:"donkeykong"},
+    }
+    playerSelected="mario"
+    let cursor=document.getElementsByTagName("cursor")[0]
+    cursor.style.left="-50px";
+    cursor.style.top="-50px";
+    document.addEventListener("mousemove",function(e){
+        cursor.style.left=e.clientX+"px";
+        cursor.style.top=e.clientY+"px";
+    })
+
+    let firstInteract=0;
+    document.querySelectorAll("nav .next").forEach(el=> {
+            el.addEventListener("click",()=>{
+                localStorage.setItem("player",playerSelected);
+                switch(el.id) {
+                    case "run":
+                        playSound('startmenu', 0.25, false)
+                        mainTheme.pause();
+                        document.querySelector("#black-mask").classList.add('show')
+                        setTimeout(() => {
+                            location = "race.html";
+                        }, 1300)
+                        return;
+                    case "course":
+                        playSound('../voice/' + playerList[playerSelected].sound, 0.25, false)
+                        break;
+                }
+                el.parentElement.parentElement.classList.remove('active')
+                playSound('select', 0.3, false)
+            })
+    })
+    document.querySelectorAll("nav .prev").forEach(el=> {
+        el.addEventListener("click",(e)=>{
+            let childList=document.querySelector("ul").children,
+                parent=el.parentElement.parentElement,
+                l=childList.length;
+            for(let i=0;i<l;i++){
+                if(childList[i].id===parent.id){
+                    setTimeout(()=>{
+                        childList[i-1].classList.add('active')
+                        playSound('prev', 0.3, false)
+                    },20)
+                    return;
+                }
+            }
+        })
+    })
+    document.querySelectorAll(".choice #less").forEach(el=> {
+        el.addEventListener('click', function(e){
+            playSound('choose-option1',0.3,false)
+            let id=el.getAttribute("data-element");
+            let obj=document.getElementById(id);
+            let min=parseInt(obj.getAttribute("min")??0)
+            let max=parseInt(obj.getAttribute("max"))
+            let value=parseInt(obj.getAttribute("value")??0)
+            value--;
+            if(value<min) value=max;
+            obj.setAttribute("value",value);
+            obj.style.backgroundPositionX="-"+value+"em";
+        })
+    })
+    document.querySelectorAll(".choice #more").forEach(el=> {
+        el.addEventListener('click', function(e){
+            playSound('choose-option1',0.3,false)
+            let id=el.getAttribute("data-element");
+            let obj=document.getElementById(id);
+            let min=parseInt(obj.getAttribute("min")??0)
+            let max=parseInt(obj.getAttribute("max"))
+            let value=parseInt(obj.getAttribute("value")??0)
+            value++;
+            if(value>max) value=min;
+            obj.setAttribute("value",value);
+            obj.style.backgroundPositionX="-"+value+"em";
+        })
+    })
+    document.querySelectorAll(".choice-kart .player").forEach(el=> {
+        el.addEventListener("click",()=>{
+            document.querySelectorAll(".choice-kart .player").forEach(players=> {
+                players.classList.remove("active")
+            })
+            playerSelected=el.dataset.value;
+            if(playerList[playerSelected]){
+                localStorage.setItem("player",playerSelected);
+                playSound('choose-option1',0.3,false)
+                el.classList.add("active")
+                document.getElementById("kart").classList.value=playerSelected;
+            }
+        })
+
+        el.addEventListener("mouseleave",()=>{
+            el.classList.remove("hover")
+        })
+        el.addEventListener("mouseenter",()=>{
+            playSound('tic-1', 0.3, false)
+            el.classList.add("hover")
+        })
+    })
+    let stepAnim=0;
+    setInterval(()=>{
+        let kart=document.getElementById("kart");
+        stepAnim++
+        if(stepAnim>=22){
+            stepAnim=0
+        }
+        let index=stepAnim,
+            mirror=1;
+        if(index>=11){
+            index=11 - index%11;
+            mirror=-1;
+        }
+        kart.style.transform="scaleX("+mirror+")";
+        kart.style.backgroundPosition=-index+"em -1em"
+    },100)
+    document.addEventListener('mousedown',()=>{
+        if(!cursor.classList.contains("clic")) cursor.classList.add('clic')
+    })
+    document.addEventListener('click',()=>{
+        if(cursor.classList.contains("clic")) cursor.classList.remove('clic')
+
+        if(firstInteract && document.getElementById("s1").classList.contains("active")){
+            firstInteract++;
+            console.log("e")
+            playSound('startmenu',0.25,false)
+            document.getElementById("s1").classList.remove("active")
+        }
+        if(!firstInteract){
+            firstInteract++;
+            mainTheme=playSound('main-theme',0.07,true)
+        }
+    })
+    document.querySelectorAll("ul li").forEach((el)=>{
+        el.classList.add("active")
+        if(!firstInteract){
+            firstInteract++;
+            mainTheme=playSound('main-theme',0.07,true)
+        }
+    })
+    window.addEventListener('blur',()=>{
+        mainTheme.pause();
+        document.querySelector("html").classList.add('lost-focus')
+    })
+    window.addEventListener('focus',()=>{
+        mainTheme.play();
+        document.querySelector("html").classList.remove('lost-focus')
+    })
+    function playSound(name,volume,loop=false,rate=1){
+        let audio = new Audio('./src/audio/'+name+'.ogg');
+        audio.playbackRate=rate;
+        audio.loop=loop;
+        audio.volume=volume
+        audio.play();
+        return audio;
+    }
+
+</script>
+</body>
+</html>

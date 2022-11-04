@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Map Editor</title>
+    <style>
+        body {background:#31435c;margin:0;overflow:hidden;display:flex;flex-direction:column;position:absolute;top:0;bottom:0;left:0;right:0}
+        .map-editor {padding:3em;flex:1;display:flex;flex-direction:column;overflow:hidden;position:relative}
+        img {object-fit:contain;margin:auto}
+        tools {height:140px;background:black}
+        map {margin:auto;height:auto;display:flex;align-items:center;justify-content:center;position:absolute}
+        objet {position:absolute;left:0;right:0;top:0;bottom:0;cursor:crosshair}
+        coin {background:url(./src/coin-100.png);font-size:12px;width:1em;height:1em;display:inline-block;background-size:cover;position:absolute;transform:translate(-50%,-50%)}
+        objet>*:hover {border:1px solid red}
+        box {background:url(./src/box.png);font-size:15px;width:1em;height:1em;display:inline-block;background-size:cover;position:absolute;transform:translate(-50%,-50%)}
+        .move objet {cursor:move}
+        cursor {left:0%;top:0%;padding:80px;border:2px dashed;position:absolute;border-radius:100%;pointer-events:none;transform:translate(-50%, -50%);display:none}
+        .lap cursor {display:block}
+        .lap.move cursor {display:none}
+        ul#lap {padding:0;list-style:none}
+        ul#lap li:hover {border:1px solid red;cursor: alias;}
+        ul#lap li {
+            transform: translate(-50%,-50%);
+            position: absolute;
+            background-color: #141414bd;
+            border-radius: 100%;
+            line-height: 0;
+            width: 0;
+            font-size: 35px;
+            font-family: monospace;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="map-editor">
+        <map>
+            <img id="map" src="./src/map-1c.png">
+            <objet>
+            </objet>
+            <ul id="lap">
+            </ul>
+            <cursor style="padding: 10%"></cursor>
+        </map>
+    </div>
+    <tools>
+        <select class="mode" name="mode">
+            <option value="0">Objets</option>
+            <option value="1">Lap</option>
+        </select>
+        <select name="selObj">
+            <option value="COIN">pieces</option>
+            <option value="BOX">box</option>
+        </select>
+        <button onclick="exportData()">Exporter les objets</button>
+        <textarea></textarea>
+    </tools>
+</body>
+<script>
+    let elMap=document.querySelector("map"),
+        objMap=document.querySelector("objet"),
+        cursor=document.querySelector("cursor"),
+        scale=1,
+        nav=false,
+        move=false,
+        movePos=[[0,0],[0,0]];
+        mode=0;
+        document.addEventListener("keydown",(e)=>{
+            if(e.key===" "){
+                nav=true;
+                document.body.classList.add('move')
+            }
+        })
+    document.addEventListener("keyup",(e)=>{
+        if(e.key===" "){
+            document.body.classList.remove('move')
+            nav=false;
+        }
+    })
+    objMap.addEventListener("wheel",function(e){
+        if(nav){
+            if(e.wheelDeltaY>0){
+                if(scale<3){
+                    scale+=0.1
+                }
+            }else{
+                if(scale>0.3){
+                    scale-=0.1
+                }
+            }
+            elMap.style.transform="scale("+scale+")";
+        }
+        if(mode===1){
+            if(e.wheelDeltaY>0){
+                cursor.style.padding=((parseFloat(cursor.style.padding)||0)+0.2)+"%";
+            }else{
+                cursor.style.padding=((parseFloat(cursor.style.padding)||0)-0.2)+"%";
+            }
+        }
+    })
+    document.addEventListener('mousemove',function(e){
+        if(move){
+            let left=movePos[1][0]+(e.screenX-movePos[0][0]),
+                top=movePos[1][1]+(e.screenY-movePos[0][1])
+            elMap.style.marginLeft=left+"px";
+            elMap.style.marginTop=top+"px"
+        }
+    })
+    objMap.addEventListener('mousemove',function(e){
+        if(mode===1){
+            let w = objMap.clientWidth,
+                h = objMap.clientHeight;
+            cursor.style.left = ((e.offsetX / w) * 100) + "%";
+            cursor.style.top = ((e.offsetY / h) * 100) + "%";
+        }
+    })
+    objMap.addEventListener('mousedown',function(e){
+        if(nav){
+            move=true;
+            movePos[0]=[e.screenX,e.screenY];
+            movePos[1]=[parseInt(elMap.style.marginLeft)|0,parseInt(elMap.style.marginTop)|0];
+        }
+
+    })
+    objMap.addEventListener('mouseup',function(e){
+        move=false;
+    })
+    objMap.addEventListener('click',function(e){
+        if(!nav) {
+            switch (mode){
+                case 0:
+                    if (e.target.nodeName === "OBJET") {
+                        let typeObj = document.querySelector("select[name=selObj]").value
+                        let w = objMap.clientWidth,
+                            h = objMap.clientHeight;
+                        let obj = document.createElement(typeObj);
+                        obj.style.left = ((e.offsetX / w) * 100) + "%";
+                        obj.style.top = ((e.offsetY / h) * 100) + "%";
+                        objMap.insertAdjacentElement("beforeend", obj)
+                    } else {
+                        e.target.remove();
+                    }
+                    document.querySelector("textarea").value = refreshJson();
+                    break;
+                case 1:
+                    let lapEl = document.createElement("li");
+                    lapEl.style.left = cursor.style.left;
+                    lapEl.style.top = cursor.style.top;
+                    lapEl.style.padding = cursor.style.padding;
+                    lapEl.addEventListener('click',()=>{
+                        lapEl.remove()
+                        refreshLap()
+                    })
+                    document.getElementById("lap").insertAdjacentElement("beforeend", lapEl)
+                    document.querySelector("textarea").value = refreshLap()
+                    break;
+            }
+        }
+    })
+    document.querySelector(".mode").addEventListener("change",(e)=>{
+        mode=parseInt(e.target.value);
+        document.body.classList.remove('lap')
+        if (mode===1){
+            document.body.classList.add('lap')
+        }
+    })
+    function refreshLap(){
+            let loop=0,
+                list= [];
+        document.querySelectorAll("ul#lap li").forEach(el=>{
+            loop++;
+            el.innerHTML=loop;
+            list.push({size:parseFloat(el.style.padding||0),x:parseFloat(el.style.left||0),y:parseFloat(el.style.top||0)})
+        })
+        list=JSON.stringify(list);
+        return list
+    }
+    function exportLap(){
+        let list=refreshLap();
+        download(list, 'map-1-lap.json', 'text/plain');
+    }
+    function refreshJson(){
+        let list= [];
+        document.querySelectorAll("objet *").forEach((el)=>{
+            list.push({name:el.nodeName,x:parseFloat(el.style.left||0),y:parseFloat(el.style.top||0)})
+        })
+        list=JSON.stringify(list);
+        return list
+    }
+    function exportData(){
+        let list=refreshJson();
+        download(list, 'map-1.json', 'text/plain');
+    }
+    function download(content, fileName, contentType) {
+        var a = document.createElement("a");
+        var file = new Blob([content], {type: contentType});
+        a.href = URL.createObjectURL(file);
+        a.download = fileName;
+        a.click();
+    }
+</script>
+</html>
