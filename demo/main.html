@@ -196,7 +196,7 @@
     document.addEventListener('mousedown',()=>{
         if(!cursor.classList.contains("clic")) cursor.classList.add('clic')
     })
-    document.addEventListener('click',()=>{
+    document.body.addEventListener('click',()=>{
         if(cursor.classList.contains("clic")) cursor.classList.remove('clic')
 
         if(firstInteract && document.getElementById("s1").classList.contains("active")){
@@ -210,13 +210,13 @@
             mainTheme=playSound('main-theme',0.07,true)
         }
     })
-    document.querySelectorAll("ul li").forEach((el)=>{
-        el.classList.add("active")
-        if(!firstInteract){
-            firstInteract++;
-            mainTheme=playSound('main-theme',0.07,true)
-        }
-    })
+    // document.querySelectorAll("ul li").forEach((el)=>{
+    //     el.classList.add("active")
+    //     if(!firstInteract){
+    //         firstInteract++;
+    //         mainTheme=playSound('main-theme',0.07,true)
+    //     }
+    // })
     window.addEventListener('blur',()=>{
         mainTheme.pause();
         document.querySelector("html").classList.add('lost-focus')
